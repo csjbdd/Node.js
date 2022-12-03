@@ -1,10 +1,19 @@
-const express = require("express");
-const app = express();
-const path = require("path");
-const PORT = process.env.PORT || 5000;
-
-console.log("hello");
-
-app.use(express.static(path.join(__dirname,"src")));
-
-app.listen(PORT, () => { console.log(`server is running ${PORT}`)});
+/* socket\app.js */
+const app = require('express')();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('chat message', (msg) => {
+    io.emit('chat message', msg);
+  });
+  socket.on('disconnect', () => {
+  console.log('user disconnected');
+  });
+}); 
+http.listen(3000, () => {
+  console.log('Connected at 3000');
+});
